@@ -1,0 +1,2 @@
+\newcommand{\lamacro}{$-1.603$}
+\newcommand{\otramacro}{$-0.006$}
