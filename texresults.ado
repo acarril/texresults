@@ -3,9 +3,9 @@ program define texresults
 syntax [using], ///
 	MACROname(string) ///
 	[ ///
-		replace append ///
-		Round(real 0) UNITzero ///
-		result(string) coef(varname) se(varname) tstat(varname) pvalue(varname) ///
+		replace Append ///
+		ROund(real 0) UNITzero ///
+		Result(string) coef(varname) se(varname) tstat(varname) pvalue(varname) ///
 	]
 
 
