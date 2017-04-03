@@ -1,7 +1,13 @@
 capture program drop texresults
 
 program define texresults
-syntax varname [using], MACROname(string) [replace append Round(real 0) UNITzero]
+syntax [using], ///
+	MACROname(string) ///
+	[ ///
+		replace append ///
+		Round(real 0) UNITzero ///
+		result(string) coef(varname) se(varname) tstat(varname) pvalue(varname) ///
+	]
 
 // Parse file action
 if !missing("`replace'") & !missing("`append'") {
@@ -14,7 +20,25 @@ local action `replace' `append'
 local macroname = "\" + "`macroname'"
 
 // Store [rounded] result
-local result = round(_b[`varlist'], `round')
+if !missing("`result'") {
+	local result = round(`result', `round')
+}
+
+if !missing("`coef'") {
+	local result = round(_b[`coef'], `round')
+}
+
+if !missing("`se'") {
+	local result = round(_se[`se'], `round')
+}
+
+if !missing("`tstat'") {
+	local result = round(_b[`tstat']/_se[`tstat'], `round')
+}
+
+if !missing("`pvalue'") {
+	local result = round(2 * ttail(e(df_r), abs(_b[`pvalue']/_se[`pvalue'])), `round')
+}
 
 // Add unit zero if option is specified and result qualifies
 if (!missing("`unitzero'") & abs(`result') < 1) {
@@ -31,9 +55,18 @@ file close texresultsfile
 end
 
 *
-cd "/Users/alvaro/Library/Application Support/Stata/ado/personal/texresults"
+*cd "/Users/alvaro/Library/Application Support/Stata/ado/personal/texresults"
 sysuse auto, clear
 reg mpg trunk weight foreign
+local lala 137
 
-texresults foreign using results.txt, macroname(lamacro) round(0.001) replace
-texresults weight using results.txt, macroname(otramacro) round(0.001) append unitzero
+
+
+texresults using results.txt, macroname(extranjero) round(0.001) replace coef(foreign)
+texresults using results.txt, macroname(extranjero_se) round(0.001) append se(foreign)
+
+texresults using results.txt, macroname(cualquierwea) round(0.001) append result(e(r2))
+
+texresults using results.txt, macroname(peso) round(0.001) append unitzero coef(weight)
+texresults using results.txt, macroname(weight_tstat) round(0.01) append unitzero tstat(weight)
+texresults using results.txt, macroname(foreign_pval) round(0.001) append unitzero pvalue(foreign)
