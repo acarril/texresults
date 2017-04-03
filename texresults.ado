@@ -4,7 +4,7 @@ syntax [using], ///
 	MACROname(string) ///
 	[ ///
 		replace Append ///
-		ROund(real 0) UNITzero ///
+		ROund(real 0.01) UNITzero ///
 		Result(string) coef(varname) se(varname) tstat(varname) pvalue(varname) ///
 	]
 
