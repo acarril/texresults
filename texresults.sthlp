@@ -3,7 +3,7 @@
 {title:Title}
 
 {p2colset 5 20 22 2}{...}
-{p2col :{hi:texresults} {hline 2}}Create external files with coefficients in Latex macros{p_end}
+{p2col :{hi:texresults} {hline 2}}Create external file of LaTeX macros with results{p_end}
 {p2colreset}{...}
 
 
@@ -11,7 +11,7 @@
 {title:Syntax}
 
 {p 8 16 2}
-{cmd:texresults} {varname} {cmd:using} {help filename:{it:filename}}{cmd:,}
+{cmd:texresults} {cmd:using} {help filename:{it:filename}}{cmd:,}
 {opth macro:name(string)}
 [
 [{opt replace|append}]
@@ -20,23 +20,40 @@
 ]
 {p_end}
 
-{synoptset 20 tabbed}{...}
+{marker opt_summary}{...}
+{synoptset 22 tabbed}{...}
 {synopthdr}
 {synoptline}
-{synoptset 20 tabbed}{...}
-{synopt:{opth macro:name(string)}} name of LaTeX macro{p_end}
-{synopt:{opt replace}} replace {help filename:{it:filename}}{p_end}
-{synopt:{opt append}} append result to {help filename:{it:filename}}{p_end}
-{synopt:{opt r:ound(real)}} round result in units of {it:real} (see {help round:round}){p_end}
-{synopt:{opt unit:zero}} add a zero digit to units if abs({it:result})<1 (e.g. 0.6 instead of .6){p_end}
-{p 4 6 2}
+{syntab:File {help reghdfe##opt_model:[+]}}
+{p2coldent:* {opt macro:name(texmacro)}}name of LaTeX macro{p_end}
+{p2coldent:+ {opt replace}}replace {help filename:{it:filename}}{p_end}
+{p2coldent:+ {opt a:ppend}}append new result to {help filename:{it:filename}}{p_end}
 
+{syntab:Result {help reghdfe##opt_model:[+]}}
+{p2coldent:+ {opt r:esult(lala)}}result to be added as {it:texmacro}{p_end}
+{p2coldent:+ {opth c:oef(varname)}}coefficient to be added as {it:texmacro}{p_end}
+{p2coldent:+ {opth se(varname)}}standard error to be added as {it:texmacro}{p_end}
+{p2coldent:+ {opth t:stat(varname)}}{it:t}-stat to be added as {it:texmacro}{p_end}
+{p2coldent:+ {opth p:value(varname)}}{it:p}-value to be added as {it:texmacro}{p_end}
+
+{syntab:Formatting {help reghdfe##opt_model:[+]}}
+{synopt:{opt ro:und(real)}}round result in units of {it:real}; see {help round:round()}{p_end}
+{synopt:{opt unit:zero}}add a zero to units digit if abs({it:result})<1 (e.g. 0.6 instead of .6){p_end}
+{synoptline}
+{p2colreset}{...}
+{p 4 6 2}* {opt macroname(texmacro)} is required.{p_end}
+{p 4 6 2}+ indicates that options are mutually exclusive within their category.{p_end}
+{p 4 6 2}{it:varname} may contain factor variables; see {help fvvarlist}.{p_end}
+
+
+{marker description}{...}
 {title:Description}
 
 {pstd}
-The {cmd:randtreat} command performs random treatment assignment.
-{cmd:randtreat}'s purpose is twofold: to easily randomize multiple, unequal treatments across strata and to provide methods to deal with "misfits" (see below).
-The program presumes that the current dataset corresponds to units (e.g. individuals, firms, etc.) to be randomly allocated to treatment statuses.
+{cmd:texresults} is a convenience command to easily store any computed result to a LaTeX macro. After running an estimation command in Stata, {cmd:texresults} can be used to create a new LaTeX macro with any 
+{p_end}
+
+{title:Description}
 
 {pstd}
 When run, it creates a new {bf:treatment} variable whose values indicate the random treatment assignment allocation.
