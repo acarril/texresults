@@ -1,4 +1,4 @@
-*! 1.1 Alvaro Carril 03apr2017
+*! 1.1 Alvaro Carril 04apr2017
 program define texresults
 syntax [using], ///
 	TEXmacro(string) ///
@@ -18,8 +18,10 @@ if !missing("`replace'") & !missing("`append'") {
 }
 local action `replace' `append'
 
-// Process texmacro
+// Add backslash to macroname and issue warning if doesn't contain only alph
+local isalph = regexm("`texmacro'","^[a-zA-Z ]*$")
 local texmacro = "\" + "`texmacro'"
+if `isalph' == 0 di as text `""`texmacro'" may not be a valid LaTeX macro name"'
 
 
 * Process and store [rounded] result
