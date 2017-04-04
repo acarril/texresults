@@ -1,6 +1,3 @@
-\newcommand{\extranjero}{$-1.603$}
-\newcommand{\extranjero_se}{$1.083$}
-\newcommand{\cualquierwea}{$.665$}
-\newcommand{\peso}{$-0.006$}
-\newcommand{\weight_tstat}{$-7.75$}
-\newcommand{\foreign_pval}{$0.143$}
+\newcommand{\rmse}{$3.42$}
+\newcommand{\mainresult}{$-1.6$}
+\newcommand{\trunkSE}{$0.13$}
