@@ -1,48 +1,42 @@
 {smcl}
-{* *! version 1 March 2016}{...}
+{* *! version 1.1 04apr2017}{...}
 {title:Title}
 
 {p2colset 5 20 22 2}{...}
 {p2col :{hi:texresults} {hline 2}}Create external file of LaTeX macros with results{p_end}
 {p2colreset}{...}
 
-
 {marker syntax}{...}
 {title:Syntax}
 
 {p 8 16 2}
 {cmd:texresults} {cmd:using} {help filename:{it:filename}}{cmd:,}
-{opth macro:name(string)}
-[
-[{opt replace|append}]
-{opt round(real)}
-{opt unitzero}
-]
+[{help texresults##options:{it:options}}]
 {p_end}
 
 {marker opt_summary}{...}
 {synoptset 22 tabbed}{...}
 {synopthdr}
 {synoptline}
-{syntab:File {help reghdfe##opt_model:[+]}}
-{p2coldent:* {opt macro:name(texmacro)}}name of LaTeX macro{p_end}
-{p2coldent:+ {opt replace}}replace {help filename:{it:filename}}{p_end}
-{p2coldent:+ {opt a:ppend}}append new result to {help filename:{it:filename}}{p_end}
+{syntab:{help texresults##opt_result:Result}^}
+{synopt: {opt r:esult(real)}}specify any result to be stored in {it:macroname}; see {help texresults##opt_result:Result} below{p_end}
+{synopt: {opth c:oef(varname)}}coefficient to be stored in {it:macroname}{p_end}
+{synopt: {opth se(varname)}}standard error to be stored in {it:macroname}{p_end}
+{synopt: {opth t:stat(varname)}}{it:t}-stat to be stored in {it:macroname}{p_end}
+{synopt: {opth p:value(varname)}}{it:p}-value to be stored in {it:macroname}{p_end}
 
-{syntab:Result {help reghdfe##opt_model:[+]}}
-{p2coldent:+ {opt r:esult(lala)}}result to be added as {it:texmacro}{p_end}
-{p2coldent:+ {opth c:oef(varname)}}coefficient to be added as {it:texmacro}{p_end}
-{p2coldent:+ {opth se(varname)}}standard error to be added as {it:texmacro}{p_end}
-{p2coldent:+ {opth t:stat(varname)}}{it:t}-stat to be added as {it:texmacro}{p_end}
-{p2coldent:+ {opth p:value(varname)}}{it:p}-value to be added as {it:texmacro}{p_end}
+{syntab:{help texresults##opt_file:File}}
+{p2coldent:* {opt tex:macro(macroname)}}name of new LaTeX macro (without backslash){p_end}
+{synopt: {opt replace}}replace {help filename:{it:filename}}{p_end}
+{synopt: {opt a:ppend}}append new result to {help filename:{it:filename}}{p_end}
 
-{syntab:Formatting {help reghdfe##opt_model:[+]}}
-{synopt:{opt ro:und(real)}}round result in units of {it:real}; see {help round:round()}{p_end}
-{synopt:{opt unit:zero}}add a zero to units digit if abs({it:result})<1 (e.g. 0.6 instead of .6){p_end}
+{syntab:{help texresults##opt_format:Formatting}}
+{synopt:{opt ro:und(real)}}round {it:result} in units of {it:real}; see {help round:round()}{p_end}
+{synopt:{opt unit:zero}}add a zero to the units digit if abs({it:result})<1 (e.g. -0.6 instead of -.6){p_end}
 {synoptline}
 {p2colreset}{...}
-{p 4 6 2}* {opt macroname(texmacro)} is required.{p_end}
-{p 4 6 2}+ indicates that options are mutually exclusive within their category.{p_end}
+{p 4 6 2}* {opt texmacro(macroname)} is required.{p_end}
+{p 4 6 2}^ options in this category are mutually exclusive.{p_end}
 {p 4 6 2}{it:varname} may contain factor variables; see {help fvvarlist}.{p_end}
 
 
@@ -50,142 +44,136 @@
 {title:Description}
 
 {pstd}
-{cmd:texresults} is a convenience command to easily store any computed result to a LaTeX macro. After running an estimation command in Stata, {cmd:texresults} can be used to create a new LaTeX macro with any 
+{cmd:texresults} is a convenience command to easily store any computed result to a LaTeX macro.
+After running an estimation command in Stata, {cmd:texresults} can be used to create a new LaTeX macro, which is stored in an external text file.
+This file may be called from a LaTeX document in order to use those results.
+
+{pstd}
+One of the main advantages of a Stata/LaTeX workflow is the automatic updating of tables and figures.
+For instance, if we add a new control variable to a regression, we can correct the do-file that produces a table of coefficients and compile the LaTeX document again to see the updated table.
+However, that advantage doesn't extend to in-text mentions of coefficients (or other results).
+This leads to documents that contain inconsistent results, which have to be manually checked every time a preliminary result changes. 
+
+{pstd}
+This sitation can be remedied by creating an external file with LaTeX macros that store all cited results of an analysis.
+Using these macros instead of manually copying results in the text is much less error prone, and we can be certain that results are consistent throughout the document.
+
+{marker options}{...}
+{title:Options}
+
+{marker opt_result}{...}
+{dlgtab:Result}
+{* Any numeric result can be stored as a LaTeX macro with texresults, including stored estimates, scalars, numeric locals or real numbers.}
+{pstd}
+The most general option for storing results is by using {opt result(real)}, which allows for any numeric input.
+Alternatively, {cmd:coef}, {cmd:se}, {cmd:tstat} and {cmd:pvalue} are convenience options that may be used to directly access (or compute) estimated coefficients, standard errors, {it:t}-stats or {it:p}-values respectively.
+
+{pstd}
+Options in this category are mutually exclusive (only one must be specified):
+
+{phang}
+{opt re:sult(real)}
+adds any {it:real} number to {it:macroname}, including scalars, locals or matrix elements.
+It can be used in post estimation.
+For instance, consider the following setup:
+
+{phang2}{cmd:. sysuse auto}{p_end}
+{phang2}{cmd:. regress mpg trunk weight foreign}{p_end}
+
+{pmore}
+We can use {cmd:result(e(r2))} to add the computed R-squared and {cmd:result(_b[foreign])} to add the estimated coefficient for {cmd:foreign}.
+However, for adding coefficients it may be easier to use {opt coef(varname)} (see below).
+
+{phang}
+{opth c:oef(varname)}
+includes {it:varname}'s coefficient in the LaTeX macro.
+For example, considering the same setup as in {opt result(real)}, we can use {cmd:coef(foreign)} to add the coefficient of {cmd:foreign}.
+
+{phang}
+{opth se(varname)}
+includes {it:varname}'s standard error in the LaTeX macro.
+For example, considering the same setup as in {opt result(real)}, we can use {cmd:se(foreign)} to add the standard error of {cmd:foreign}.
+
+{phang}
+{opth t:stat(varname)}
+includes {it:varname}'s {it:t}-stat in the LaTeX macro.
+For example, considering the same setup as in {opt result(real)}, we can use {cmd:tstat(foreign)} to add the {it:t}-stat of {cmd:foreign}.
+
+{phang}
+{opth p:value(varname)}
+includes {it:varname}'s {it:p}-value in the LaTeX macro.
+For example, considering the same setup as in {opt result(real)}, we can use {cmd:pvalue(foreign)} to add the {it:p}-value of {cmd:foreign}.
+
+{marker opt_file}{...}
+{dlgtab:File}
+
+{phang}
+{opt tex:macro(macroname)} will save the specified result in a LaTeX macro with name {it:macroname}, automatically appending an initial backslash.
+For example, the option {opt macroname(weirdresult)} will create the LaTeX macro {cmd:\weirdresult}, which will print the specified result when used in a LaTeX document.
+
+{pmore}
+{cmd:texresults} will issue a warning if {it:macroname} is not a valid LaTeX macro, that is, if it doesn't contain only uppercase and lowercase alphabetical characters (assuming new macros don't consist of a single non-alphabetical character).
+
+{phang}
+{opt replace} will replace all contents in {it:filename} with a new LaTeX macro; see {help file:[P] file}.
+
+{phang}
+{opt a:ppend} will append the new LaTeX macro to the end of {it:filename}; see {help file:[P] file}.
+
+{marker opt_format}{...}
+{dlgtab:Formatting}
+
+{phang}
+{opt ro:und(real)} will round the result in units of {it:real}; see {help round:round()}. By default all results will be rounded to 2 decimal digits, that is, {cmd:round(0.01)}.
+So if the specified result is 1.082598, it will be displayed as 1.08.
+
+{pmore}
+If you don't want to apply any rounding, use {cmd:round(0)}.
+
+{phang}
+{opt unit:zero} will add a zero to the units digit if abs({help texresults##opt_result:{it:result}})<1, which is usually preferred in text.
+For example, a coefficient whose value is -.6 will be stored as -0.6.
 {p_end}
 
-{title:Description}
 
-{pstd}
-When run, it creates a new {bf:treatment} variable whose values indicate the random treatment assignment allocation.
-The seed can be set with the {opt setseed()} option, so the random assignment can be replicated.
-Although the command defaults to two treatments, more {it:equally} proportioned treatments can be specified with the {opt multiple()} option.
-Alternatively, multiple treatments of {it:unequal} proportions can be specified with the {opt unequal()} option.
-A stratified assignment can be performed using the {opth strata(varlist)} option.
-If specified, the random assingment will be carried out for each strata defined by the unique combinations of values of {varlist}.
-
-{pstd}
-Whenever the number of observations in a given stratum is not a multiple of the number of treatments or the least common multiple of the treatment fractions, then that stratum is going to have "misfits", that is, observations that can't be neatly distributed among the treatments.
-When run, {cmd:randtreat} reports the number of misfits produced by the assignment in the current dataset.
-Misfits are automatically marked with missing values in the {bf:treatment} variable, but {cmd:randtreat} provides several methods to deal with them.
-The method can be specified with the {opt misfits()} option.
-
-{pstd}
-One of the firsts to discuss the misfits problem were Bruhn and McKenzie (2011),
-in a {browse "http://blogs.worldbank.org/impactevaluations/tools-of-the-trade-doing-stratified-randomization-with-unequal-numbers-in-some-strata":World Bank Blog post}.
-A generalization of the problem and details of the Stata implementation can be found in 
-{browse "https://www.researchgate.net/publication/292091060_Dealing_with_misfits_in_random_treatment_assignment":Carril, 2016}, or my related {browse "http://alvarocarril.com/resources/randtreat":blog post}.
-
-{dlgtab:Options}
-
-{phang}
-{opth strata(varlist)} is used to perform a stratified allocation on the variables in {varlist}.
-If specified, the random assignment will be carried out in each stratum identified by the unique combination of the {varlist} variables' values.
-Notice that this option is almost identical to using {cmd:by} (see {manhelp by D}), except that the command is not independently run for the specified variables, because global existence of misfits across strata must be accounted for.
-
-{phang}
-{opth multiple(integer)} specifies the number of treatments to be assigned.
-The default (and minimum) is {cmd:multiple(2)}, unless the {opt unequal()} option is specified (see below).
-
-{phang}
-{opt unequal(fractions)} is used to specify unequal treatment fractions.
-Each fraction must be of the form a/b and must belong to (0,1).
-Fractions must be separated by spaces and their sum must add up exactly to 1.
-For example, {cmd:unequal(1/2 1/4 1/4)} will randomly assign half of the observations to the "control" group and then divide evenly the rest of the observations into two treatments.
-Notice that this option implicitly defines the number of treatments (e.g. 3), so when {opt unequal()} is used, {opt mult()} is redundant and should be avoided.
-
-{phang}
-{opt misfits(method)} specifies which method to use in order to deal with misfits.
-More details on the internal workings of these methods are available in {browse "https://www.researchgate.net/publication/292091060_Dealing_with_misfits_in_random_treatment_assignment":Carril, 2016}.
-The available {it:method}s are:
-
-{phang2}
-{it: missing} is the default option and simply leaves misfit observations as missing values in {bf:treatment}, so the user can later deal with misfits as he sees fit.
-
-{phang2}
-{it: strata} randomly allocates misfits independently accross all strata, without weighting treatments as specified in {opt unequal}.
-This method prioritizes balance of misfits' treatment allocation within each stratum (they can't differ by more than 1), but may harm original treatment fractions if the number of misfits is large.
-
-{phang2}
-{it: global} randomly allocates all misfits globally, without weighting treatments as specified in {opt unequal}.
-This method prioritizes global balance of misfits' treatment allocation (they can't differ by more than 1), but may harm original treatment fractions if the number of misfits is large.
-
-{phang2}
-{it: wstrata} randomly allocates misfits independently accross all strata, weighting treatments as specified in {opt unequal}.
-This ensures that the fractions specified in {bf:unequal()} affect the within-distribution of treatments among misfits, so overall balance of unequal treatments should be (almost) attained.
-However, this method doesn't ensure the balance of misfits' treatment allocation within each stratum (they could differ by more than 1).
-
-{phang2}
-{it: wglobal} randomly allocates all misfits globally, weighting treatments as specified in {opt unequal}.
-This ensures balance at the the global level and also respects unequal fractions of treatments, even when the number of misfits is large.
-However, this method doesn't ensure the global balance of misfits' treatment allocation (they could differ by more than 1).
-The downside is that this method could produce even greater unbalance at the finer level (in each stratum), specially if the number of misfits is relatively large.
-
-{phang}
-{opt setseed(#)} specifies the initial value of the random-number seed used to assign treatments.
-It can be set so that the random treatment assignment can be replicated.
-See {help set seed:set seed} for more information.
-
-{phang}
-{opt replace} checks that the {bf:treatment} variable exists and, if so, it replaces it.
-This is useful if one is trying different specifications for {cmd:randtreat} and wishes to avoid dropping the {bf:treatment} variable every time.
-
+{marker examples}{...}
 {title:Examples}
 
-{pstd}
-I suggest you {cmd:{help tabulate} {bf:treatment}} with the {cmd:missing} option after running each example.
-First, load the fictional blood-pressure data:
+{pstd}Stata setup{p_end}
+{phang2}{cmd:. sysuse auto}{p_end}
+{phang2}{cmd:. regress mpg trunk weight foreign}{p_end}
 
-	{cmd:sysuse bpwide, clear}
+{pstd}Store root MSE of model in "results.txt", rounded by default to 2 decimal digits (default), with macro name "\rmse":{p_end}
+{phang2}{cmd:. texresults using results.txt, texmacro(rmse) result(e(rmse))}{p_end}
 
-{pstd}
-Basic usage:
+{pstd}Append {cmd:foreign} coefficient macro to "results.txt", rounded to 1 decimal digit. The created macro is "\mainresult":{p_end}
+{phang2}{cmd:. texresults using results.txt, texmacro(mainresult) coef(foreign) append}{p_end}
 
-	{cmd:randtreat}
-	{cmd:randtreat, replace mult(5)}
+{pstd}Append {cmd:trunk} standard error with macro name "\trunkSE", adding a zero to unit digit:{p_end}
+{phang2}{cmd:. texresults using results.txt, texmacro(trunkSE) se(trunk) unitzero append}{p_end}
 
-{pstd}
-Define stratification variables and unequal treatments, dealing with misfits:
+{pstd}LaTeX document:{p_end}
+{phang2}{cmd:\documentclass{article}}{p_end}
+{phang2}{cmd:\input{results.txt}}{p_end}
+{phang2}{cmd:\begin{document}}{p_end}
+{phang2}{cmd:The model's root MSE is \rmse, }{p_end}
+{phang2}{cmd:foreign coefficient is \mainresult, and}{p_end}
+{phang2}{cmd:trunk standard error is \trunkSE.}{p_end}
+{phang2}{cmd:\end{document}}{p_end}
 
-	{cmd:randtreat, replace unequal(1/2 1/3 1/6)}
-	{cmd:randtreat, replace unequal(1/2 1/3 1/6) strata(sex agegrp) misfits(strata)}
-	{cmd:randtreat, replace unequal(1/2 1/3 1/6) strata(sex agegrp) misfits(overall)}
-
-{pstd}	
-Choose very unbalanced treatment fractions and dealing with misfits with and without weights:
-
-	{cmd:randtreat, replace unequal(2/5 1/5 1/5 1/5) misfits(global) setseed(12345)}
-	{cmd:randtreat, replace unequal(2/5 1/5 1/5 1/5) misfits(wglobal) setseed(12345)}
-
-{title:Notes}
-
-{pstd}
-Beware of (ab)using {opt unequal()} with fractions that yield a large least common multiple (LCM), because that may produce a large number of misfits. Consider for example:
-	
-	{cmd: sysuse bpwide, clear}
-	{cmd: randtreat, unequal(2/5 1/3 3/20 3/20)}
-	{cmd: tab treatment, missing}
-	
-{pstd}
-Since the LCM of the specified fractions is 60, the theoretical maximum number of misfits per stratum could be 59.
-In this particular dataset, this configuration produces 58 misfits, which is a relatively large number given that the dataset has 120 observations.
-
+{marker author}{...}
 {title:Author}
 
 {pstd}Alvaro Carril{break}
 Research Analyst at J-PAL LAC{break}
+acarril.github.io{break}
 acarril@fen.uchile.cl
 
+{marker acknowledgements}{...}
 {title:Acknowledgements}
 
 {pstd}
-I'm indebted to several "random helpers" at the Random Help Google user group and in the Statalist Forum, who provided coding advice and snippets.
-Colleagues at the J-PAL LAC office, specially Olivia Bordeu and Diego Escobar, put up with my incoherent ideas and helped me steer this into something mildly useful.
-
-{title:References}
-
-{phang}Bruhn, Miriam, and David McKenzie. 2011. Tools of the Trade: Doing Stratified Randomization with Uneven Numbers in Some Strata. Blog. The World Bank: Impact Evaluations.
-{browse "http://blogs.worldbank.org/impactevaluations/tools-of-the-trade-doing-stratified-randomization-with-unequal-numbers-in-some-strata"}.
-
-{phang}Carril, Alvaro. 2016. Dealing with misfits in random treatment assignment. Working Paper. DOI: 10.13140/RG.2.1.2859.8807
-{browse "https://www.researchgate.net/publication/292091060_Dealing_with_misfits_in_random_treatment_assignment"}.
-
+The creation of this program arose out of necessity, as me and a team of other RAs needed a way to streamline the inclusion of results in paper drafts.
+This team includes Andre Cazor, Raul Duarte, Maximiliano Garcia, João Marcos Garcia, Shanon Hsu, Jemimah Muraya, Nikolai Schaffner and Jose Vila-Belda.
+I thank them all for their valuable feedback and continuous (long distance) support.
+{p_end}
