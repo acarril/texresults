@@ -1,7 +1,7 @@
 *! 1.1 Alvaro Carril 03apr2017
 program define texresults
 syntax [using], ///
-	MACROname(string) ///
+	TEXmacro(string) ///
 	[ ///
 		replace Append ///
 		ROund(real 0.01) UNITzero ///
@@ -18,8 +18,8 @@ if !missing("`replace'") & !missing("`append'") {
 }
 local action `replace' `append'
 
-// Process macroname
-local macroname = "\" + "`macroname'"
+// Process texmacro
+local texmacro = "\" + "`texmacro'"
 
 
 * Process and store [rounded] result
@@ -55,7 +55,7 @@ if (!missing("`unitzero'") & abs(`result') < 1) {
 * Create or modify macros file
 *------------------------------------------------------------------------------
 file open texresultsfile `using', write `action'
-file write texresultsfile "\newcommand{`macroname'}{$`result'$}" _n
+file write texresultsfile "\newcommand{`texmacro'}{$`result'$}" _n
 file close texresultsfile
 *di as text `" Open {browse results.txt}"'
 
