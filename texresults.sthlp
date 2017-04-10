@@ -33,6 +33,7 @@
 {syntab:{help texresults##opt_format:Formatting}}
 {synopt:{opt ro:und(real)}}round {it:result} in units of {it:real}; see {help round:round()}{p_end}
 {synopt:{opt unit:zero}}add a zero to the units digit if abs({it:result})<1 (e.g. -0.6 instead of -.6){p_end}
+{synopt:{opt xs:pace}}use {cmd:xspace} LaTeX command in macros; see the {browse "https://www.ctan.org/pkg/xspace":xspace package}{p_end}
 {synoptline}
 {p2colreset}{...}
 {p 4 6 2}* {opt texmacro(macroname)} is required.{p_end}
@@ -133,7 +134,25 @@ If you don't want to apply any rounding, use {cmd:round(0)}.
 {phang}
 {opt unit:zero} will add a zero to the units digit if abs({help texresults##opt_result:{it:result}})<1, which is usually preferred in text.
 For example, a coefficient whose value is -.6 will be stored as -0.6.
-{p_end}
+
+{phang}
+{opt xs:pace} will add the {cmd:\xspace} LaTeX command to the created macro, which automatically decides whether to insert a space to replace the one "eaten" by the TeX command decoder.
+
+{pmore}
+For example, if you save the macro {cmd:\MeanLotteries} and write
+
+{phang3}{cmd:The firms participate in an average of \MeanLotteries lotteries}{p_end}
+
+{pmore}
+you will see "The firms participate in an average of 3.14lotteries".
+In order to avoid this, the canonical solution is to add an empty argument after calling the macro:
+
+{phang3}{cmd:The firms participate in an average of \MeanLotteries{} lotteries}{p_end}
+
+{pmore}
+However, it would make no sense if {cmd:texresults} added this empty argument automatically (or even as an option), because there would be some cases where the macro is used before a punctuation mark, which would have an unwanted space before it.
+So one solution is to use the {browse "https://www.ctan.org/pkg/xspace":xspace package}, which automatically decides whether to insert a space to replace the one "eaten" by the TeX command decoder.
+See {browse "http://tex.stackexchange.com/questions/31091/space-after-latex-commands":this question} in tex.SE for further details.
 
 
 {marker examples}{...}
