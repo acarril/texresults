@@ -66,3 +66,13 @@ file close texresultsfile
 *di as text `" Open {browse results.txt}"'
 
 end
+
+********************************************************************************
+
+/* 
+CHANGE LOG
+1.2
+	- Implement xspace option
+
+1.1
+	- First public version
