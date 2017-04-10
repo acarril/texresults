@@ -4,7 +4,7 @@ capture erase results.txt
 sysuse auto, clear
 reg mpg trunk weight foreign
 
-texresults using results.txt, texmacro(rmse) result(e(rmse))
+texresults using results.txt, texmacro(rmse) result(e(rmse)) xspace
 texresults using results.txt, texmacro(mainresult) coef(foreign) append
 texresults using results.txt, texmacro(trunkSE) se(trunk) unitzero append
 

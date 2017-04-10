@@ -1,11 +1,11 @@
-*! 1.1 Alvaro Carril 04apr2017
+*! 1.2 Alvaro Carril 04apr2017
 program define texresults
 syntax [using], ///
 	TEXmacro(string) ///
 	[ ///
 		replace Append ///
-		ROund(real 0.01) UNITzero ///
 		Result(string) coef(varname) se(varname) tstat(varname) pvalue(varname) ///
+		ROund(real 0.01) UNITzero XSpace ///
 	]
 
 
@@ -23,6 +23,10 @@ local isalph = regexm("`texmacro'","^[a-zA-Z ]*$")
 local texmacro = "\" + "`texmacro'"
 if `isalph' == 0 di as text `""`texmacro'" may not be a valid LaTeX macro name"'
 
+// 
+if !missing("`xspace'") local xspace = "\" + "`xspace'"
+
+di "opcion: `xspace'"
 
 * Process and store [rounded] result
 *------------------------------------------------------------------------------
@@ -57,7 +61,7 @@ if (!missing("`unitzero'") & abs(`result') < 1) {
 * Create or modify macros file
 *------------------------------------------------------------------------------
 file open texresultsfile `using', write `action'
-file write texresultsfile "\newcommand{`texmacro'}{$`result'$}" _n
+file write texresultsfile "\newcommand{`texmacro'}{$`result'$`xspace'}" _n
 file close texresultsfile
 *di as text `" Open {browse results.txt}"'
 
